@@ -110,7 +110,7 @@ Then, modify the following section of `main.go`:
 var sounds = map[string]string{
   // If you want to use "moo.wav" after work,
   // change "ohyeah.wav" to "moo.wav"
-  "work": "moo.wav", 
+  	"work": "moo.wav", 
 	"rest": "ding.wav",
 	"end":  "cheers.wav",
 }
