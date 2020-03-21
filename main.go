@@ -99,7 +99,6 @@ func checkValidity(intervals []string) error {
 		minute, err := strconv.Atoi(interval)
 		if err != nil {
 			return err
-			// fmt.Errorf("You entered %q. The interval must be an integer", interval)
 		} else if minute <= 0 {
 			return fmt.Errorf("You entered %q. The interval must be more than 0", interval)
 		}

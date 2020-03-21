@@ -36,4 +36,17 @@ func TestRunTimerWithValidIntegers(t *testing.T) {
 		}
 	})
 
+	t.Run("NoSoundFiles", func(t *testing.T) {
+		sounds = map[string]string{
+			// modify according to your file name
+			"work": "",
+			"rest": "",
+			"end":  "",
+		}
+		err := runTimer()
+		if err == nil {
+			t.Error("Having no sound files should return an error.")
+		}
+	})
+
 }
