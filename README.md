@@ -90,7 +90,7 @@ go run . "work yo!"
 
 ### Change sound
 
-The sound after each intervals are configurable.
+The sound after each interval is configurable.
 
 There are three types of sounds:
 
@@ -122,8 +122,6 @@ To test the program, run:
 go test
 ```
 
-
-
 ## Contributing
 
 This is such a small and unpopular project that I'm not sure if it's worth contributing to.
@@ -142,3 +140,4 @@ cheers.wav by [FoolBoyMedia](https://freesound.org/people/FoolBoyMedia/sounds/39
 
 ## License
 
+MIT License. Refer to [LICENSE.md](https://github.com/wanzulfikri/custom-timer/blob/master/LICENSE.md).
