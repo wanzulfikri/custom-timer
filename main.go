@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -23,9 +24,6 @@ var workType = map[bool]string{
 //	i)  work  - after every odd interval
 //  ii) rest  - after every even interval
 //  ii) end   - at the end of program
-//
-//  Example: if program input is 10, 5, 10, then the sequence of sound would be
-//	work -> rest -> work -> end.
 var sounds = map[string]string{
 	// modify according to your file name
 	"work": "ohyeah.wav",
@@ -37,20 +35,32 @@ var sounds = map[string]string{
 // In testing, modify this to time.Millisecond or time.Nanosecond to shorten
 // test duration.
 var timeModifier = time.Minute
+var playSound = true
+var logIntervals = true
 
 func main() {
+	err := runTimer()
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func runTimer() error {
 	intervals := os.Args[1:]
 	if len(intervals) == 0 {
-		log.Fatal("No timer interval added. Please rerun the timer with at least one interval")
+		return errors.New("No timer interval added. Please rerun the timer with at least one interval")
 	}
 
 	err := checkValidity(intervals)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	workBuffer, format := getBuffer(sounds["work"])
-	restBuffer, _ := getBuffer(sounds["rest"])
+	workBuffer, format, err := getBuffer(sounds["work"])
+	restBuffer, _, err := getBuffer(sounds["rest"])
+	if err != nil {
+		return err
+	}
 	speaker.Init(format.SampleRate, format.SampleRate.N(time.Second/10))
 	isWorking := true
 	buffer := workBuffer
@@ -62,24 +72,30 @@ func main() {
 		}
 		minute, err := strconv.Atoi(intervals[i])
 		if err != nil {
-			panic(err)
+			return err
 		}
 		timer := time.NewTimer(time.Duration(minute) * timeModifier)
 		sound := buffer.Streamer(0, buffer.Len())
-		fmt.Printf("%v %v: %v -> %v", i, workType[isWorking], time.Now().Format(time.Kitchen), time.Now().Add(timeModifier*time.Duration(minute)).Format(time.Kitchen))
+		fmt.Printf("%v %v: %v -> %v\n", i, workType[isWorking], time.Now().Format(time.Kitchen), time.Now().Add(timeModifier*time.Duration(minute)).Format(time.Kitchen))
 		<-timer.C
-		speaker.Play(sound)
+		if playSound {
+			speaker.Play(sound)
+		}
 		isWorking = !isWorking
 	}
 	time.Sleep(time.Second * 2)
-	playOnce(sounds["end"])
+	if playSound {
+		playOnce(sounds["end"])
+	}
+	return nil
 }
 
 func checkValidity(intervals []string) error {
 	for _, interval := range intervals {
 		minute, err := strconv.Atoi(interval)
 		if err != nil {
-			return fmt.Errorf("You entered %q. The interval must be an integer", interval)
+			return err
+			// fmt.Errorf("You entered %q. The interval must be an integer", interval)
 		} else if minute <= 0 {
 			return fmt.Errorf("You entered %q. The interval must be more than 0", interval)
 		}
@@ -87,15 +103,15 @@ func checkValidity(intervals []string) error {
 	return nil
 }
 
-func playOnce(filename string) {
+func playOnce(filename string) error {
 	f, err := os.Open(filename)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	streamer, _, err := wav.Decode(f)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	done := make(chan bool)
@@ -107,20 +123,21 @@ func playOnce(filename string) {
 	time.Sleep(time.Second)
 
 	defer streamer.Close()
+	return nil
 }
 
-func getBuffer(filename string) (*(beep.Buffer), beep.Format) {
+func getBuffer(filename string) (*(beep.Buffer), beep.Format, error) {
 	f, err := os.Open(filename)
 	if err != nil {
-		log.Fatal(err)
+		return nil, beep.Format{}, err
 	}
 
 	streamer, format, err := wav.Decode(f)
 	if err != nil {
-		log.Fatal(err)
+		return nil, beep.Format{}, err
 	}
 	buffer := beep.NewBuffer(format)
 	buffer.Append(streamer)
 	streamer.Close()
-	return buffer, format
+	return buffer, format, nil
 }
