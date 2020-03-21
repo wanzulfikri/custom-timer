@@ -10,7 +10,7 @@ func TestRunTimerWithValidIntegers(t *testing.T) {
 	timeModifier = time.Nanosecond
 	playSound = false
 
-	t.Run("Valid Integers", func(t *testing.T) {
+	t.Run("ValidIntegers", func(t *testing.T) {
 		os.Args = []string{"", "1", "1"}
 		err := runTimer()
 		if err != nil {
@@ -18,8 +18,11 @@ func TestRunTimerWithValidIntegers(t *testing.T) {
 		}
 	})
 
-	t.Run("Negative integers", func(t *testing.T) {
-
+	t.Run("NegativeIntegers", func(t *testing.T) {
+		os.Args = []string{"", "-1", "-2"}
+		err := runTimer()
+		if err == nil {
+			t.Error("Negative integers should return an error.")
+		}
 	})
-
 }
