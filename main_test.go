@@ -8,7 +8,9 @@ import (
 
 func TestRunTimerWithValidIntegers(t *testing.T) {
 	timeModifier = time.Nanosecond
+	sleepModifier = time.Nanosecond
 	playSound = false
+	logIntervals = false
 
 	t.Run("ValidIntegers", func(t *testing.T) {
 		os.Args = []string{"", "1", "1"}
@@ -25,4 +27,13 @@ func TestRunTimerWithValidIntegers(t *testing.T) {
 			t.Error("Negative integers should return an error.")
 		}
 	})
+
+	t.Run("Non-Integers", func(t *testing.T) {
+		os.Args = []string{"", "0.2", "string"}
+		err := runTimer()
+		if err == nil {
+			t.Error("Non-integers should return an error.")
+		}
+	})
+
 }

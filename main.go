@@ -34,7 +34,9 @@ var sounds = map[string]string{
 // timeModifier will be multiplied by program input to give actual timer duration.
 // In testing, modify this to time.Millisecond or time.Nanosecond to shorten
 // test duration.
+// Do the same for sleepModifier. Change it to time.Millisecond or time.Nanosecond
 var timeModifier = time.Minute
+var sleepModifier = time.Second
 var playSound = true
 var logIntervals = true
 
@@ -76,14 +78,16 @@ func runTimer() error {
 		}
 		timer := time.NewTimer(time.Duration(minute) * timeModifier)
 		sound := buffer.Streamer(0, buffer.Len())
-		fmt.Printf("%v %v: %v -> %v\n", i, workType[isWorking], time.Now().Format(time.Kitchen), time.Now().Add(timeModifier*time.Duration(minute)).Format(time.Kitchen))
+		if logIntervals {
+			fmt.Printf("%v %v: %v -> %v\n", i, workType[isWorking], time.Now().Format(time.Kitchen), time.Now().Add(timeModifier*time.Duration(minute)).Format(time.Kitchen))
+		}
 		<-timer.C
 		if playSound {
 			speaker.Play(sound)
 		}
 		isWorking = !isWorking
 	}
-	time.Sleep(time.Second * 2)
+	time.Sleep(sleepModifier * 2)
 	if playSound {
 		playOnce(sounds["end"])
 	}
