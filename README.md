@@ -12,7 +12,7 @@ Note: As of now, the intervals don't repeat themselves. If you set the interval 
 
 [Beep](https://github.com/faiface/beep) - dependency for playing sounds.
 
-_Later, I'll create a release thus removing the need for the above prerequisites._
+_Want to execute only without installing anything? [Binary is available.](https://github.com/wanzulfikri/custom-timer/releases)_
 
 ## Install
 
